@@ -152,12 +152,14 @@ def create_app() -> FastAPI:
     app.state.pipeline_running = False
 
     from app.api.health import router as health_router
+    from app.api.ingest import router as ingest_router
     from app.api.models_api import router as models_router
     from app.api.stats import router as stats_router
     from app.api.threats import router as threats_router
     from app.api.websocket import router as ws_router
 
     app.include_router(health_router)
+    app.include_router(ingest_router)
     app.include_router(threats_router)
     app.include_router(stats_router)
     app.include_router(models_router)

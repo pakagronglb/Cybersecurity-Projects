@@ -76,14 +76,31 @@ _FILE_INCLUSION = (r"(?:php://|"
                    r"phar://|"
                    r"glob://)")
 
+_SSRF = (
+    r"(?:169\.254\.169\.254|"
+    r"metadata\.google\.internal|"
+    r"169\.254\.170\.2|"
+    r"100\.100\.100\.200|"
+    r"(?:localhost|127\.0\.0\.1|0\.0\.0\.0)(?::\d+)?/(?!$)|"
+    r"file:///(?:etc|proc|sys)|"
+    r"dict://|"
+    r"gopher://)"
+)
+
+_LOG4SHELL = r"(?:\$\{(?:j(?:ndi|ava)|lower|upper|:-|:\+|#))"
+
 SQLI = re.compile(_SQLI, re.IGNORECASE)
 XSS = re.compile(_XSS, re.IGNORECASE)
 PATH_TRAVERSAL = re.compile(_PATH_TRAVERSAL, re.IGNORECASE)
 COMMAND_INJECTION = re.compile(_COMMAND_INJECTION, re.IGNORECASE)
 FILE_INCLUSION = re.compile(_FILE_INCLUSION, re.IGNORECASE)
+SSRF = re.compile(_SSRF, re.IGNORECASE)
+LOG4SHELL = re.compile(_LOG4SHELL, re.IGNORECASE)
 
 ATTACK_COMBINED = re.compile(
-    r"|".join(
-        (_SQLI, _XSS, _PATH_TRAVERSAL, _COMMAND_INJECTION, _FILE_INCLUSION)),
+    r"|".join((
+        _SQLI, _XSS, _PATH_TRAVERSAL, _COMMAND_INJECTION,
+        _FILE_INCLUSION, _SSRF, _LOG4SHELL,
+    )),
     re.IGNORECASE,
 )

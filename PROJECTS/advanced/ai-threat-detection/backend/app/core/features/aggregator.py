@@ -91,7 +91,7 @@ class WindowAggregator:
 
         results = await pipe.execute()
 
-        read_start = 14
+        read_start = len(keys) * 2
         req_count_1m = results[read_start]
         req_count_5m = results[read_start + 1]
         req_count_10m = results[read_start + 2]

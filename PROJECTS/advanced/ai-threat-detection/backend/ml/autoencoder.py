@@ -45,7 +45,6 @@ class ThreatAutoencoder(nn.Module):
             nn.LeakyReLU(0.2),
             nn.Dropout(0.2),
             nn.Linear(24, input_dim),
-            nn.Sigmoid(),
         )
 
     def encode(self, x: Tensor) -> Tensor:

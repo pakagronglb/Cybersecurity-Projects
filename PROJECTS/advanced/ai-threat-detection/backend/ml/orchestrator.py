@@ -88,9 +88,7 @@ class TrainingOrchestrator:
             len(split.X_normal_train),
         )
 
-        with VigilExperiment(
-            self._experiment_name
-        ) as experiment:
+        with VigilExperiment(self._experiment_name) as experiment:
             experiment.log_params({
                 "epochs": self._epochs,
                 "batch_size": self._batch_size,
@@ -100,37 +98,26 @@ class TrainingOrchestrator:
                 "n_features": X.shape[1],
             })
 
-            ae_result = self._train_ae(
-                split.X_normal_train
-            )
+            ae_result = self._train_ae(split.X_normal_train)
             ae_metrics = {
                 "ae_threshold": ae_result["threshold"],
-                "ae_final_train_loss": ae_result[
-                    "history"
-                ]["train_loss"][-1],
-                "ae_final_val_loss": ae_result[
-                    "history"
-                ]["val_loss"][-1],
+                "ae_final_train_loss": ae_result["history"]["train_loss"][-1],
+                "ae_final_val_loss": ae_result["history"]["val_loss"][-1],
             }
 
-            rf_result = self._train_rf(
-                split.X_train, split.y_train
-            )
+            rf_result = self._train_rf(split.X_train, split.y_train)
             rf_metrics = rf_result["metrics"]
 
-            if_result = self._train_if(
-                split.X_normal_train
-            )
+            if_result = self._train_if(split.X_normal_train)
             if_metrics = if_result["metrics"]
 
-            self._export_models(
-                ae_result, rf_result, if_result
-            )
+            self._export_models(ae_result, rf_result, if_result)
 
             experiment.log_metrics(ae_metrics)
-            experiment.log_metrics(
-                {f"rf_{k}": v for k, v in rf_metrics.items()}
-            )
+            experiment.log_metrics({
+                f"rf_{k}": v
+                for k, v in rf_metrics.items()
+            })
 
             try:
                 ensemble = validate_ensemble(
@@ -172,9 +159,7 @@ class TrainingOrchestrator:
             mlflow_run_id=run_id,
         )
 
-    def _train_ae(
-        self, X_normal: np.ndarray
-    ) -> dict:
+    def _train_ae(self, X_normal: np.ndarray) -> dict:
         """
         Train the autoencoder on normal-only data
         """
@@ -189,9 +174,7 @@ class TrainingOrchestrator:
             batch_size=self._batch_size,
         )
 
-    def _train_rf(
-        self, X: np.ndarray, y: np.ndarray
-    ) -> dict:
+    def _train_rf(self, X: np.ndarray, y: np.ndarray) -> dict:
         """
         Train the random forest classifier
         """
@@ -201,9 +184,7 @@ class TrainingOrchestrator:
         )
         return train_random_forest(X, y)
 
-    def _train_if(
-        self, X_normal: np.ndarray
-    ) -> dict:
+    def _train_if(self, X_normal: np.ndarray) -> dict:
         """
         Train the isolation forest on normal-only data
         """
@@ -226,15 +207,10 @@ class TrainingOrchestrator:
             ae_result["model"],
             self._output_dir / AE_FILENAME,
         )
-        ae_result["scaler"].save_json(
-            self._output_dir / SCALER_FILENAME
-        )
-        threshold_data = {
-            "threshold": ae_result["threshold"]
-        }
+        ae_result["scaler"].save_json(self._output_dir / SCALER_FILENAME)
+        threshold_data = {"threshold": ae_result["threshold"]}
         (self._output_dir / THRESHOLD_FILENAME).write_text(
-            json.dumps(threshold_data, indent=2)
-        )
+            json.dumps(threshold_data, indent=2))
 
         export_random_forest(
             rf_result["model"],
@@ -248,6 +224,4 @@ class TrainingOrchestrator:
             self._output_dir / IF_FILENAME,
         )
 
-        logger.info(
-            "Exported models to %s", self._output_dir
-        )
+        logger.info("Exported models to %s", self._output_dir)

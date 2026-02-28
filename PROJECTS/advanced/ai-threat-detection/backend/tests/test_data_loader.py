@@ -155,8 +155,7 @@ class TestParseCSICFile:
         assert post_req.method == "POST"
         assert "nombre=Juan" in post_req.body
 
-    def test_parses_attack_file_with_label_1(
-            self, tmp_path: Path) -> None:
+    def test_parses_attack_file_with_label_1(self, tmp_path: Path) -> None:
         """
         Attack file entries get label=1
         """
@@ -193,8 +192,7 @@ class TestParseCSICFile:
         assert post_req.method == "POST"
         assert "OR+1=1" in post_req.body
 
-    def test_malformed_blocks_skipped(
-            self, tmp_path: Path) -> None:
+    def test_malformed_blocks_skipped(self, tmp_path: Path) -> None:
         """
         Malformed/non-HTTP lines are skipped gracefully
         """
@@ -207,8 +205,7 @@ class TestParseCSICFile:
         assert results[0].method == "GET"
         assert results[0].path == "/valid/path"
 
-    def test_empty_file_returns_empty_list(
-            self, tmp_path: Path) -> None:
+    def test_empty_file_returns_empty_list(self, tmp_path: Path) -> None:
         """
         Empty file returns an empty list
         """
@@ -324,8 +321,7 @@ class TestLoadCSICDataset:
         assert 0 in y
         assert 1 in y
 
-    def test_label_counts_match_files(
-            self, tmp_path: Path) -> None:
+    def test_label_counts_match_files(self, tmp_path: Path) -> None:
         """
         Normal and attack counts match the number of requests in each file
         """
@@ -339,8 +335,7 @@ class TestLoadCSICDataset:
         assert np.sum(y == 0) == 5
         assert np.sum(y == 1) == 4
 
-    def test_feature_values_are_finite(
-            self, tmp_path: Path) -> None:
+    def test_feature_values_are_finite(self, tmp_path: Path) -> None:
         """
         All feature values are finite (no NaN or Inf)
         """

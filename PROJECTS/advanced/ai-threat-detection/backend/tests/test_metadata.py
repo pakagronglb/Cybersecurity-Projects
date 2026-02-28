@@ -35,9 +35,9 @@ async def db_session(tmp_path: Path):
     async with engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)
 
-    factory = async_sessionmaker(
-        engine, class_=AsyncSession, expire_on_commit=False
-    )
+    factory = async_sessionmaker(engine,
+                                 class_=AsyncSession,
+                                 expire_on_commit=False)
     async with factory() as session:
         yield session
 
@@ -53,11 +53,11 @@ def model_artifacts(tmp_path: Path) -> Path:
     (tmp_path / "rf.onnx").write_bytes(b"rf-model-data-456")
     (tmp_path / "if.onnx").write_bytes(b"if-model-data-789")
     (tmp_path / "scaler.json").write_text(
-        json.dumps({"center": [0.0], "scale": [1.0]})
-    )
-    (tmp_path / "threshold.json").write_text(
-        json.dumps({"threshold": 0.05})
-    )
+        json.dumps({
+            "center": [0.0],
+            "scale": [1.0]
+        }))
+    (tmp_path / "threshold.json").write_text(json.dumps({"threshold": 0.05}))
     return tmp_path
 
 
@@ -66,46 +66,31 @@ class TestComputeModelVersion:
     Test SHA-256 based model version hashing
     """
 
-    def test_returns_12_char_hex(
-        self, model_artifacts: Path
-    ) -> None:
+    def test_returns_12_char_hex(self, model_artifacts: Path) -> None:
         """
         Version string is a 12-character hex digest
         """
-        version = compute_model_version(
-            model_artifacts / "ae.onnx"
-        )
+        version = compute_model_version(model_artifacts / "ae.onnx")
 
         assert len(version) == 12
         assert all(c in "0123456789abcdef" for c in version)
 
-    def test_same_file_same_version(
-        self, model_artifacts: Path
-    ) -> None:
+    def test_same_file_same_version(self, model_artifacts: Path) -> None:
         """
         Same file produces the same version string
         """
-        v1 = compute_model_version(
-            model_artifacts / "ae.onnx"
-        )
-        v2 = compute_model_version(
-            model_artifacts / "ae.onnx"
-        )
+        v1 = compute_model_version(model_artifacts / "ae.onnx")
+        v2 = compute_model_version(model_artifacts / "ae.onnx")
 
         assert v1 == v2
 
-    def test_different_files_different_versions(
-        self, model_artifacts: Path
-    ) -> None:
+    def test_different_files_different_versions(self,
+                                                model_artifacts: Path) -> None:
         """
         Different files produce different version strings
         """
-        v_ae = compute_model_version(
-            model_artifacts / "ae.onnx"
-        )
-        v_rf = compute_model_version(
-            model_artifacts / "rf.onnx"
-        )
+        v_ae = compute_model_version(model_artifacts / "ae.onnx")
+        v_rf = compute_model_version(model_artifacts / "rf.onnx")
 
         assert v_ae != v_rf
 
@@ -128,7 +113,10 @@ class TestSaveModelMetadata:
             db_session,
             model_dir=model_artifacts,
             training_samples=500,
-            metrics={"f1": 0.9, "pr_auc": 0.88},
+            metrics={
+                "f1": 0.9,
+                "pr_auc": 0.88
+            },
         )
 
         assert len(rows) == 3
@@ -190,9 +178,7 @@ class TestSaveModelMetadata:
             metrics={"f1": 0.9},
         )
 
-        (model_artifacts / "ae.onnx").write_bytes(
-            b"new-ae-data"
-        )
+        (model_artifacts / "ae.onnx").write_bytes(b"new-ae-data")
         await save_model_metadata(
             db_session,
             model_dir=model_artifacts,
@@ -200,13 +186,9 @@ class TestSaveModelMetadata:
             metrics={"f1": 0.95},
         )
 
-        result = await db_session.execute(
-            select(ModelMetadata)
-        )
+        result = await db_session.execute(select(ModelMetadata))
         all_rows = result.scalars().all()
         active_rows = [r for r in all_rows if r.is_active]
 
         assert len(active_rows) == 3
-        assert all(
-            r.training_samples == 600 for r in active_rows
-        )
+        assert all(r.training_samples == 600 for r in active_rows)

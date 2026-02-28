@@ -253,9 +253,7 @@ def _make_entry(
     )
 
 
-def generate_sqli_requests(
-    n: int,
-) -> list[ParsedLogEntry]:
+def generate_sqli_requests(n: int, ) -> list[ParsedLogEntry]:
     """
     Generate n requests with SQL injection payloads
     """
@@ -273,8 +271,7 @@ def generate_sqli_requests(
                     response_size=random.randint(0, 5000),
                     user_agent=random.choice(NORMAL_UAS),
                     ip=_random_private_ip(),
-                )
-            )
+                ))
         else:
             entries.append(
                 _make_entry(
@@ -285,14 +282,11 @@ def generate_sqli_requests(
                     response_size=random.randint(0, 2000),
                     user_agent=random.choice(NORMAL_UAS),
                     ip=_random_private_ip(),
-                )
-            )
+                ))
     return entries
 
 
-def generate_xss_requests(
-    n: int,
-) -> list[ParsedLogEntry]:
+def generate_xss_requests(n: int, ) -> list[ParsedLogEntry]:
     """
     Generate n requests with XSS payloads
     """
@@ -309,14 +303,11 @@ def generate_xss_requests(
                 response_size=random.randint(500, 5000),
                 user_agent=random.choice(NORMAL_UAS),
                 ip=_random_private_ip(),
-            )
-        )
+            ))
     return entries
 
 
-def generate_traversal_requests(
-    n: int,
-) -> list[ParsedLogEntry]:
+def generate_traversal_requests(n: int, ) -> list[ParsedLogEntry]:
     """
     Generate n requests with path traversal payloads
     """
@@ -332,14 +323,11 @@ def generate_traversal_requests(
                 response_size=random.randint(0, 1000),
                 user_agent=random.choice(NORMAL_UAS),
                 ip=_random_private_ip(),
-            )
-        )
+            ))
     return entries
 
 
-def generate_log4shell_requests(
-    n: int,
-) -> list[ParsedLogEntry]:
+def generate_log4shell_requests(n: int, ) -> list[ParsedLogEntry]:
     """
     Generate n requests with Log4Shell JNDI payloads
     """
@@ -356,14 +344,11 @@ def generate_log4shell_requests(
                 response_size=random.randint(0, 2000),
                 user_agent=payload,
                 ip=_random_private_ip(),
-            )
-        )
+            ))
     return entries
 
 
-def generate_ssrf_requests(
-    n: int,
-) -> list[ParsedLogEntry]:
+def generate_ssrf_requests(n: int, ) -> list[ParsedLogEntry]:
     """
     Generate n requests with SSRF target URLs
     """
@@ -380,14 +365,11 @@ def generate_ssrf_requests(
                 response_size=random.randint(0, 3000),
                 user_agent=random.choice(NORMAL_UAS),
                 ip=_random_private_ip(),
-            )
-        )
+            ))
     return entries
 
 
-def generate_scanner_requests(
-    n: int,
-) -> list[ParsedLogEntry]:
+def generate_scanner_requests(n: int, ) -> list[ParsedLogEntry]:
     """
     Generate n requests mimicking vulnerability scanners
     """
@@ -396,25 +378,18 @@ def generate_scanner_requests(
         path = random.choice(ATTACK_PATHS)
         entries.append(
             _make_entry(
-                method=random.choice(
-                    ["GET", "HEAD", "OPTIONS"]
-                ),
+                method=random.choice(["GET", "HEAD", "OPTIONS"]),
                 path=path,
                 query_string="",
-                status_code=random.choice(
-                    [200, 301, 403, 404]
-                ),
+                status_code=random.choice([200, 301, 403, 404]),
                 response_size=random.randint(0, 500),
                 user_agent=random.choice(SCANNER_UAS),
                 ip=_random_private_ip(),
-            )
-        )
+            ))
     return entries
 
 
-def generate_normal_requests(
-    n: int,
-) -> list[ParsedLogEntry]:
+def generate_normal_requests(n: int, ) -> list[ParsedLogEntry]:
     """
     Generate n realistic benign HTTP requests
     """
@@ -422,31 +397,20 @@ def generate_normal_requests(
     for _ in range(n):
         path = random.choice(NORMAL_PATHS)
         has_query = random.random() < 0.3
-        query = (
-            f"page={random.randint(1, 20)}"
-            if has_query
-            else ""
-        )
+        query = (f"page={random.randint(1, 20)}" if has_query else "")
         entries.append(
             _make_entry(
-                method=random.choice(
-                    ["GET", "GET", "GET", "POST"]
-                ),
+                method=random.choice(["GET", "GET", "GET", "POST"]),
                 path=path,
                 query_string=query,
-                status_code=random.choice(
-                    [200, 200, 200, 301, 304]
-                ),
+                status_code=random.choice([200, 200, 200, 301, 304]),
                 response_size=random.randint(200, 50000),
                 user_agent=random.choice(NORMAL_UAS),
-            )
-        )
+            ))
     return entries
 
 
-def _entries_to_vectors(
-    entries: list[ParsedLogEntry],
-) -> list[list[float]]:
+def _entries_to_vectors(entries: list[ParsedLogEntry], ) -> list[list[float]]:
     """
     Convert ParsedLogEntry list to 35-dim feature vectors
     """
@@ -473,20 +437,12 @@ def generate_mixed_dataset(
     remainder = n_attack - (per_type * 6)
 
     attacks: list[ParsedLogEntry] = []
-    attacks.extend(
-        generate_sqli_requests(per_type + remainder)
-    )
+    attacks.extend(generate_sqli_requests(per_type + remainder))
     attacks.extend(generate_xss_requests(per_type))
-    attacks.extend(
-        generate_traversal_requests(per_type)
-    )
-    attacks.extend(
-        generate_log4shell_requests(per_type)
-    )
+    attacks.extend(generate_traversal_requests(per_type))
+    attacks.extend(generate_log4shell_requests(per_type))
     attacks.extend(generate_ssrf_requests(per_type))
-    attacks.extend(
-        generate_scanner_requests(per_type)
-    )
+    attacks.extend(generate_scanner_requests(per_type))
     attack_vectors = _entries_to_vectors(attacks)
 
     X = np.array(
@@ -494,8 +450,7 @@ def generate_mixed_dataset(
         dtype=np.float32,
     )
     y = np.array(
-        [0] * len(normal_vectors)
-        + [1] * len(attack_vectors),
+        [0] * len(normal_vectors) + [1] * len(attack_vectors),
         dtype=np.int32,
     )
 

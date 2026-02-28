@@ -46,9 +46,7 @@ def trained_model_dir(tmp_path: Path) -> Path:
     scaler.fit(X_normal)
     scaler.save_json(tmp_path / "scaler.json")
 
-    (tmp_path / "threshold.json").write_text(
-        json.dumps({"threshold": 0.05})
-    )
+    (tmp_path / "threshold.json").write_text(json.dumps({"threshold": 0.05}))
 
     return tmp_path
 
@@ -60,9 +58,7 @@ def separable_test_data() -> tuple[np.ndarray, np.ndarray]:
     """
     rng = np.random.default_rng(99)
     X_normal = rng.standard_normal((50, 35)).astype(np.float32)
-    X_attack = (
-        rng.standard_normal((30, 35)).astype(np.float32) + 3.0
-    )
+    X_attack = (rng.standard_normal((30, 35)).astype(np.float32) + 3.0)
     X = np.vstack([X_normal, X_attack])
     y = np.array([0] * 50 + [1] * 30, dtype=np.int32)
     return X, y
@@ -183,7 +179,11 @@ class TestValidateEnsemble:
             trained_model_dir,
             X_test,
             y_test,
-            ensemble_weights={"ae": 0.5, "rf": 0.3, "if": 0.2},
+            ensemble_weights={
+                "ae": 0.5,
+                "rf": 0.3,
+                "if": 0.2
+            },
         )
 
         assert isinstance(result, ValidationResult)

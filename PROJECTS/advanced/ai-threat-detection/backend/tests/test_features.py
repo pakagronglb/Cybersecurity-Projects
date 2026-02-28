@@ -5,9 +5,16 @@ test_features.py
 Tests per-request feature extraction, Redis sliding-window aggregation, and feature encoding.
 """
 
+import time
 from datetime import datetime, UTC
 
+import fakeredis.aioredis
+import pytest
+
+from app.core.features.aggregator import WindowAggregator
+from app.core.features.encoder import encode_for_inference
 from app.core.features.extractor import extract_request_features
+from app.core.features.mappings import FEATURE_ORDER, METHOD_MAP, STATUS_CLASS_MAP
 from app.core.ingestion.parsers import ParsedLogEntry
 
 FEATURE_KEYS = {
@@ -264,13 +271,6 @@ def test_country_code_passthrough() -> None:
     assert features_empty["country_code"] == ""
 
 
-import time  # noqa: E402
-
-import fakeredis.aioredis  # noqa: E402
-import pytest  # noqa: E402
-
-from app.core.features.aggregator import WindowAggregator  # noqa: E402
-
 AGGREGATOR_KEYS = {
     "req_count_1m",
     "req_count_5m",
@@ -444,10 +444,6 @@ async def test_aggregator_window_boundary(aggregator) -> None:
     )
     assert result["req_count_1m"] == 1
     assert result["req_count_5m"] == 2
-
-
-from app.core.features.encoder import encode_for_inference  # noqa: E402
-from app.core.features.mappings import FEATURE_ORDER, METHOD_MAP, STATUS_CLASS_MAP  # noqa: E402
 
 
 def _full_features() -> dict[str, int | float | bool | str]:

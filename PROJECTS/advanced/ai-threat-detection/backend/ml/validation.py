@@ -66,34 +66,20 @@ def validate_ensemble(
 
     engine = InferenceEngine(model_dir=str(model_dir))
     if not engine.is_loaded:
-        raise RuntimeError(
-            f"Failed to load models from {model_dir}"
-        )
+        raise RuntimeError(f"Failed to load models from {model_dir}")
 
-    raw_scores = engine.predict(
-        X_test.astype(np.float32),
-    )
+    raw_scores = engine.predict(X_test.astype(np.float32), )
     if raw_scores is None:
         raise RuntimeError("Inference returned None")
 
-    fused = _compute_fused_scores(
-        raw_scores, engine.threshold, weights
-    )
+    fused = _compute_fused_scores(raw_scores, engine.threshold, weights)
 
     y_pred = (fused >= BINARY_THRESHOLD).astype(np.int32)
 
-    prec = float(
-        precision_score(y_test, y_pred, zero_division=0)
-    )
-    rec = float(
-        recall_score(y_test, y_pred, zero_division=0)
-    )
-    f1_val = float(
-        f1_score(y_test, y_pred, zero_division=0)
-    )
-    pr_auc_val = float(
-        average_precision_score(y_test, fused)
-    )
+    prec = float(precision_score(y_test, y_pred, zero_division=0))
+    rec = float(recall_score(y_test, y_pred, zero_division=0))
+    f1_val = float(f1_score(y_test, y_pred, zero_division=0))
+    pr_auc_val = float(average_precision_score(y_test, fused))
     roc_auc_val = float(roc_auc_score(y_test, fused))
 
     cm = confusion_matrix(y_test, y_pred).tolist()
@@ -141,13 +127,9 @@ def _compute_fused_scores(
     for i in range(n_samples):
         per_model: dict[str, float] = {}
 
-        per_model["ae"] = normalize_ae_score(
-            raw_scores["ae"][i], threshold
-        )
+        per_model["ae"] = normalize_ae_score(raw_scores["ae"][i], threshold)
         per_model["rf"] = raw_scores["rf"][i]
-        per_model["if"] = normalize_if_score(
-            raw_scores["if"][i]
-        )
+        per_model["if"] = normalize_if_score(raw_scores["if"][i])
 
         fused[i] = fuse_scores(per_model, weights)
 

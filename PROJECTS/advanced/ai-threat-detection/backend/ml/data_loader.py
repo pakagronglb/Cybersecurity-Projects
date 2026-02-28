@@ -19,15 +19,12 @@ logger = logging.getLogger(__name__)
 
 _REQUEST_LINE_RE = re.compile(
     r"^(GET|POST|PUT|DELETE|HEAD|OPTIONS|PATCH|TRACE)"
-    r"\s+(\S+)\s+(HTTP/\d\.\d)\s*$"
-)
+    r"\s+(\S+)\s+(HTTP/\d\.\d)\s*$")
 
 _DEFAULT_IP = "192.168.1.100"
 
-_DEFAULT_UA = (
-    "Mozilla/5.0 (compatible; Konqueror/3.5; Linux)"
-    " KHTML/3.5.8 (like Gecko)"
-)
+_DEFAULT_UA = ("Mozilla/5.0 (compatible; Konqueror/3.5; Linux)"
+               " KHTML/3.5.8 (like Gecko)")
 
 _WINDOWED_FEATURE_NAMES: list[str] = [
     "req_count_1m",
@@ -136,9 +133,7 @@ def _parse_request_block(
             key, value = line.split(": ", 1)
             headers[key] = value
 
-    body_lines = [
-        ln for ln in lines[body_start:] if ln.strip()
-    ]
+    body_lines = [ln for ln in lines[body_start:] if ln.strip()]
     body = "\n".join(body_lines)
 
     return CSICRequest(
@@ -161,9 +156,7 @@ def csic_to_parsed_entry(req: CSICRequest) -> ParsedLogEntry:
 
     query = req.query_string
     if req.body:
-        query = (
-            f"{query}&{req.body}" if query else req.body
-        )
+        query = (f"{query}&{req.body}" if query else req.body)
 
     return ParsedLogEntry(
         ip=_DEFAULT_IP,

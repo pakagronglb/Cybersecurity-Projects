@@ -42,17 +42,17 @@ class TestAutoencoderArchitecture:
             out = model(x)
         assert out.shape == (1, 35)
 
-    def test_output_values_in_zero_one_range(self) -> None:
+    def test_output_is_unbounded(self) -> None:
         """
-        Decoder output is bounded to [0, 1] by the final activation.
+        Decoder output is unbounded to match RobustScaler-transformed input range.
         """
         model = ThreatAutoencoder(input_dim=35)
         model.eval()
-        x = torch.randn(32, 35)
+        x = torch.randn(64, 35) * 3.0
         with torch.no_grad():
             out = model(x)
-        assert out.min() >= 0.0
-        assert out.max() <= 1.0
+        assert out.shape == (64, 35)
+        assert out.min().item() < 0.0 or out.max().item() > 1.0
 
     def test_reconstruction_error_shape(self) -> None:
         """

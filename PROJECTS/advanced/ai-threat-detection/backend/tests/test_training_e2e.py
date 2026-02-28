@@ -5,7 +5,6 @@ test_training_e2e.py
 
 from pathlib import Path
 
-
 from app.core.detection.ensemble import (
     blend_scores,
     fuse_scores,
@@ -27,24 +26,19 @@ class TestTrainingE2E:
     End-to-end training integration test
     """
 
-    def test_full_training_produces_loadable_models(
-        self, tmp_path: Path
-    ) -> None:
+    def test_full_training_produces_loadable_models(self,
+                                                    tmp_path: Path) -> None:
         """
         Full pipeline produces models that load and predict
         """
-        X, y = generate_mixed_dataset(
-            N_NORMAL, N_ATTACK
-        )
+        X, y = generate_mixed_dataset(N_NORMAL, N_ATTACK)
         assert X.shape == (
             N_NORMAL + N_ATTACK,
             N_FEATURES,
         )
 
         model_dir = tmp_path / "models"
-        orch = TrainingOrchestrator(
-            output_dir=model_dir, epochs=3
-        )
+        orch = TrainingOrchestrator(output_dir=model_dir, epochs=3)
         result = orch.run(X, y)
 
         expected_files = [
@@ -55,9 +49,7 @@ class TestTrainingE2E:
             "threshold.json",
         ]
         for filename in expected_files:
-            assert (
-                model_dir / filename
-            ).exists(), f"Missing {filename}"
+            assert (model_dir / filename).exists(), f"Missing {filename}"
 
         engine = InferenceEngine(str(model_dir))
         assert engine.is_loaded
@@ -72,12 +64,8 @@ class TestTrainingE2E:
 
         threshold = engine.threshold
         for i in range(5):
-            ae_score = normalize_ae_score(
-                predictions["ae"][i], threshold
-            )
-            if_score = normalize_if_score(
-                predictions["if"][i]
-            )
+            ae_score = normalize_ae_score(predictions["ae"][i], threshold)
+            if_score = normalize_if_score(predictions["if"][i])
             rf_score = predictions["rf"][i]
 
             scores = {
@@ -85,9 +73,7 @@ class TestTrainingE2E:
                 "rf": rf_score,
                 "if": if_score,
             }
-            fused = fuse_scores(
-                scores, ENSEMBLE_WEIGHTS
-            )
+            fused = fuse_scores(scores, ENSEMBLE_WEIGHTS)
             assert 0.0 <= fused <= 1.0
 
             blended = blend_scores(fused, 0.0)

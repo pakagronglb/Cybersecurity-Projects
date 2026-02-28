@@ -26,35 +26,25 @@ class TestCLICommands:
     Test CLI help output and argument validation
     """
 
-    def test_train_help_shows_csic_dir(
-        self,
-    ) -> None:
+    def test_train_help_shows_csic_dir(self, ) -> None:
         """
         train --help shows csic-dir option
         """
-        result = runner.invoke(
-            app, ["train", "--help"]
-        )
+        result = runner.invoke(app, ["train", "--help"])
         assert result.exit_code == 0
         assert "csic-dir" in _clean(result.output)
 
-    def test_train_help_shows_synthetic_options(
-        self,
-    ) -> None:
+    def test_train_help_shows_synthetic_options(self, ) -> None:
         """
         train --help shows synthetic normal and attack options
         """
-        result = runner.invoke(
-            app, ["train", "--help"]
-        )
+        result = runner.invoke(app, ["train", "--help"])
         assert result.exit_code == 0
         output = _clean(result.output)
         assert "synthetic-normal" in output
         assert "synthetic-attack" in output
 
-    def test_train_invalid_csic_dir_fails(
-        self,
-    ) -> None:
+    def test_train_invalid_csic_dir_fails(self, ) -> None:
         """
         train with nonexistent csic-dir exits with error
         """
@@ -76,9 +66,7 @@ class TestCLICommands:
         """
         replay --help exits cleanly and mentions log
         """
-        result = runner.invoke(
-            app, ["replay", "--help"]
-        )
+        result = runner.invoke(app, ["replay", "--help"])
         assert result.exit_code == 0
         assert "log" in _clean(result.output)
 
@@ -86,9 +74,7 @@ class TestCLICommands:
         """
         serve --help exits cleanly and mentions host
         """
-        result = runner.invoke(
-            app, ["serve", "--help"]
-        )
+        result = runner.invoke(app, ["serve", "--help"])
         assert result.exit_code == 0
         assert "host" in _clean(result.output)
 
@@ -96,18 +82,14 @@ class TestCLICommands:
         """
         config --help exits cleanly
         """
-        result = runner.invoke(
-            app, ["config", "--help"]
-        )
+        result = runner.invoke(app, ["config", "--help"])
         assert result.exit_code == 0
 
     def test_health_help(self) -> None:
         """
         health --help exits cleanly
         """
-        result = runner.invoke(
-            app, ["health", "--help"]
-        )
+        result = runner.invoke(app, ["health", "--help"])
         assert result.exit_code == 0
 
     def test_replay_missing_log_fails(self) -> None:

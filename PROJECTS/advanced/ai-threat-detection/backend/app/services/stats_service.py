@@ -67,7 +67,7 @@ async def get_stats(
 
     return StatsResponse(
         time_range=time_range,
-        total_requests=total,
+        threats_stored=total,
         threats_detected=threats_detected,
         severity_breakdown=SeverityBreakdown(
             high=sev_map.get("HIGH", 0),

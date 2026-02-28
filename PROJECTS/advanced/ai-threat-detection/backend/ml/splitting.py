@@ -39,9 +39,7 @@ def prepare_training_data(
     """
     n_classes = len(np.unique(y))
     if n_classes < 2:
-        raise ValueError(
-            "y must contain at least 2 classes"
-        )
+        raise ValueError("y must contain at least 2 classes")
 
     test_size = 1.0 - train_ratio
     X_train, X_rem, y_train, y_rem = train_test_split(
@@ -67,18 +65,13 @@ def prepare_training_data(
     majority_count = class_counts.max()
     current_ratio = minority_count / majority_count
 
-    if (
-        minority_count >= smote_k + 1
-        and current_ratio < smote_strategy
-    ):
+    if (minority_count >= smote_k + 1 and current_ratio < smote_strategy):
         sampler = SMOTE(
             sampling_strategy=smote_strategy,
             k_neighbors=smote_k,
             random_state=random_state,
         )
-        X_train, y_train = sampler.fit_resample(
-            X_train, y_train
-        )
+        X_train, y_train = sampler.fit_resample(X_train, y_train)
 
     return TrainingSplit(
         X_train=X_train,

@@ -24,8 +24,7 @@ def _make_dataset(
     """
     rng = np.random.default_rng(42)
     X = rng.standard_normal(
-        (n_normal + n_attack, n_features)
-    ).astype(np.float32)
+        (n_normal + n_attack, n_features)).astype(np.float32)
     y = np.array(
         [0] * n_normal + [1] * n_attack,
         dtype=np.int32,
@@ -55,16 +54,10 @@ class TestPrepareTrainingData:
         expected_val = int(TOTAL * 0.15)
         expected_test = int(TOTAL * 0.15)
         tolerance = int(TOTAL * 0.05)
-        assert abs(
-            result.X_val.shape[0] - expected_val
-        ) <= tolerance
-        assert abs(
-            result.X_test.shape[0] - expected_test
-        ) <= tolerance
+        assert abs(result.X_val.shape[0] - expected_val) <= tolerance
+        assert abs(result.X_test.shape[0] - expected_test) <= tolerance
 
-    def test_stratified_class_distribution(
-        self,
-    ) -> None:
+    def test_stratified_class_distribution(self, ) -> None:
         """
         Splits preserve the original class ratio
         """
@@ -74,12 +67,8 @@ class TestPrepareTrainingData:
         val_ratio = np.mean(result.y_val == 1)
         test_ratio = np.mean(result.y_test == 1)
         ratio_tol = 0.10
-        assert abs(
-            val_ratio - original_ratio
-        ) < ratio_tol
-        assert abs(
-            test_ratio - original_ratio
-        ) < ratio_tol
+        assert abs(val_ratio - original_ratio) < ratio_tol
+        assert abs(test_ratio - original_ratio) < ratio_tol
 
     def test_smote_increases_minority(self) -> None:
         """
@@ -105,24 +94,12 @@ class TestPrepareTrainingData:
         remainder = TOTAL - int(TOTAL * 0.70)
         half = remainder // 2
         tol = 3
-        assert abs(
-            result.X_val.shape[0] - half
-        ) <= tol
-        assert abs(
-            result.X_test.shape[0] - half
-        ) <= tol
-        assert (
-            result.X_val.shape[0]
-            == result.y_val.shape[0]
-        )
-        assert (
-            result.X_test.shape[0]
-            == result.y_test.shape[0]
-        )
+        assert abs(result.X_val.shape[0] - half) <= tol
+        assert abs(result.X_test.shape[0] - half) <= tol
+        assert (result.X_val.shape[0] == result.y_val.shape[0])
+        assert (result.X_test.shape[0] == result.y_test.shape[0])
 
-    def test_x_normal_train_only_normals(
-        self,
-    ) -> None:
+    def test_x_normal_train_only_normals(self, ) -> None:
         """
         X_normal_train has only class-0 rows
         """
@@ -130,13 +107,8 @@ class TestPrepareTrainingData:
         result = prepare_training_data(X, y)
         expected = int(N_NORMAL * 0.70)
         tol = int(TOTAL * 0.05)
-        assert abs(
-            result.X_normal_train.shape[0] - expected
-        ) <= tol
-        assert (
-            result.X_normal_train.shape[1]
-            == N_FEATURES
-        )
+        assert abs(result.X_normal_train.shape[0] - expected) <= tol
+        assert (result.X_normal_train.shape[1] == N_FEATURES)
 
     def test_small_dataset_works(self) -> None:
         """
@@ -147,24 +119,18 @@ class TestPrepareTrainingData:
             n_attack=10,
             n_features=N_FEATURES,
         )
-        result = prepare_training_data(
-            X, y, smote_k=3
-        )
+        result = prepare_training_data(X, y, smote_k=3)
         assert isinstance(result, TrainingSplit)
         assert result.X_train.shape[0] > 0
         assert result.X_val.shape[0] > 0
         assert result.X_test.shape[0] > 0
 
-    def test_all_one_class_raises_value_error(
-        self,
-    ) -> None:
+    def test_all_one_class_raises_value_error(self, ) -> None:
         """
         Single-class labels raise ValueError
         """
         rng = np.random.default_rng(99)
-        X = rng.standard_normal(
-            (100, N_FEATURES)
-        ).astype(np.float32)
+        X = rng.standard_normal((100, N_FEATURES)).astype(np.float32)
         y_zeros = np.zeros(100, dtype=np.int32)
         with pytest.raises(ValueError):
             prepare_training_data(X, y_zeros)
@@ -172,9 +138,7 @@ class TestPrepareTrainingData:
         with pytest.raises(ValueError):
             prepare_training_data(X, y_ones)
 
-    def test_smote_skipped_minority_too_small(
-        self,
-    ) -> None:
+    def test_smote_skipped_minority_too_small(self, ) -> None:
         """
         Tiny minority skips SMOTE gracefully
         """
@@ -183,8 +147,6 @@ class TestPrepareTrainingData:
             n_attack=10,
             n_features=N_FEATURES,
         )
-        result = prepare_training_data(
-            X, y, smote_k=50
-        )
+        result = prepare_training_data(X, y, smote_k=50)
         assert isinstance(result, TrainingSplit)
         assert result.X_train.shape[0] > 0

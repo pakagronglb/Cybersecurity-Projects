@@ -38,7 +38,7 @@ def fuse_scores(
             weight_sum += weight
     if weight_sum == 0:
         return 0.0
-    return total / weight_sum * weight_sum
+    return total / weight_sum
 
 
 def blend_scores(

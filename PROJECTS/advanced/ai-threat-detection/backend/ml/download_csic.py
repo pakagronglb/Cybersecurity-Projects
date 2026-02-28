@@ -13,11 +13,9 @@ logger = logging.getLogger(__name__)
 
 DATASET_DIR = Path("data/datasets/csic2010")
 
-BASE_URL = (
-    "https://gitlab.fing.edu.uy"
-    "/gsi/web-application-attacks-datasets"
-    "/-/raw/master/csic_2010"
-)
+BASE_URL = ("https://gitlab.fing.edu.uy"
+            "/gsi/web-application-attacks-datasets"
+            "/-/raw/master/csic_2010")
 
 FILES = [
     "normalTrafficTraining.txt",
@@ -57,9 +55,7 @@ def _compute_sha256(path: Path) -> str:
     return h.hexdigest()
 
 
-def download_csic(
-    output_dir: Path = DATASET_DIR,
-) -> None:
+def download_csic(output_dir: Path = DATASET_DIR, ) -> None:
     """
     Download CSIC 2010 dataset files
     """
@@ -69,9 +65,7 @@ def download_csic(
         dest = output_dir / filename
 
         if dest.exists() and dest.stat().st_size > MIN_FILE_BYTES:
-            logger.info(
-                "Skipping %s (already exists)", filename
-            )
+            logger.info("Skipping %s (already exists)", filename)
             continue
 
         url = f"{BASE_URL}/{filename}"
@@ -92,16 +86,12 @@ def download_csic(
 
         size = dest.stat().st_size
         sha = _compute_sha256(dest)
-        print(
-            f"  Saved: {dest}"
-            f" ({size:,} bytes, sha256={sha[:12]})"
-        )
+        print(f"  Saved: {dest}"
+              f" ({size:,} bytes, sha256={sha[:12]})")
 
         if size < MIN_FILE_BYTES:
-            print(
-                f"  WARNING: {filename} is suspiciously"
-                f" small ({size:,} bytes)"
-            )
+            print(f"  WARNING: {filename} is suspiciously"
+                  f" small ({size:,} bytes)")
 
     print(f"\nDataset directory: {output_dir.resolve()}")
 

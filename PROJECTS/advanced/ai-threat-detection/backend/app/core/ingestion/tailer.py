@@ -56,6 +56,15 @@ class _LogHandler(FileSystemEventHandler):
             self._file = None
             self._inode = None
 
+    def _enqueue(self, line: str) -> None:
+        """
+        Push one line into the queue, logging drops on full queue
+        """
+        try:
+            self._queue.put_nowait(line)
+        except asyncio.QueueFull:
+            logger.warning("Raw queue full — log line dropped")
+
     def _read_new_lines(self) -> None:
         """
         Read all new complete lines from the current file position.
@@ -66,8 +75,7 @@ class _LogHandler(FileSystemEventHandler):
         for line in self._file:
             stripped = line.rstrip("\n\r")
             if stripped:
-                self._loop.call_soon_threadsafe(self._queue.put_nowait,
-                                                stripped)
+                self._loop.call_soon_threadsafe(self._enqueue, stripped)
 
     def _handle_rotation(self) -> None:
         """
